@@ -1,0 +1,5 @@
+# ignore assets so people can create their own
+**/assets/
+
+# ignore the example dump
+**/example/

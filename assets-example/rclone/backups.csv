@@ -1,0 +1,3 @@
+Group,Source,Remote,RemotePath
+windows,local,local,$env:USERPROFILE/.envfiles/example
+windows,local,onedrive,/envfiles/example
