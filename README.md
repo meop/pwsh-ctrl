@@ -1,26 +1,21 @@
 # Prerequisite
 
-Set up the PowerShell profile project:
+Install PowerShell profile project
 
-https://github.com/meop/profile-pwsh.git
-
-
-# Clone
-
-The prerequisite project comes with a default initializer for ~/.envfiles/bin
-
-So you can either clone this project to ~/.envfiles
-
-Or somewhere else, and edit the prerequisite project's initializer
+https://tfs.prd.costargroup.com/CostarCollection/CoStarSuite-Git/_git/analytics-profile-pwsh
 
 
 # Setup
+
+Make a copy of the assets directory so that you have your own directory in parallel, ie:
+
+> pseudo: cp -r ./assets-example ./assets
 
 Copy the Initializers file to the corresponding profile folder
 
 > pseudo: cp ./Initializers/* /%userprofile%/Documents/Powershell/Initializers/
 
-* Edit your /Initializers/*.ps1 file to use your environment name and set the path to this repo
+Edit your /Initializers/*.ps1 file to set the path to this repo
 
 
 # Configure
