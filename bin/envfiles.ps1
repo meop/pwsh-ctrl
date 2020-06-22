@@ -1,31 +1,60 @@
 param(
     [Parameter(Mandatory = $false)] [string] $GroupName
-    , [Parameter(Mandatory = $false)] [string] $SourceName
-    , [Parameter(Mandatory = $false)] [string] $RemoteName
-    , [Parameter(Mandatory = $false)] [string] $Filter
+    , [Parameter(Mandatory = $false)] [string] $SourceFilter
+    , [Parameter(Mandatory = $false)] [string] $RemoteFilter
+    , [Parameter(Mandatory = $false)] [string] $PathFilter
     , [Parameter(Mandatory = $false)] [switch] $Restore
     , [Parameter(Mandatory = $false)] [switch] $CopyLinks
     , [Parameter(Mandatory = $false)] [switch] $DryRun
+    , [Parameter(Mandatory = $false)] [switch] $AsSudo
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 )
 
+. "$PSScriptRoot/../source.ps1"
+
 if (-not $GroupName) { $GroupName = $env:OS_ID }
 
-$old_profile_assets_dir = $global:PROFILE_ASSETS_DIR
-$global:PROFILE_ASSETS_DIR = "$PSScriptRoot/../assets"
+$backups = rCloneGetBackups `
+    -GroupName $GroupName `
+    -SourceFilter $SourceFilter `
+    -RemoteFilter $RemoteFilter
 
+if (-not $backups) {
+    Write-Host "no matching backups"
+}
+
+$backupItems = rCloneGetBackupItems `
+    -GroupName $GroupName `
+    -PathFilter $PathFilter
+
+if (-not $backupItems) {
+    Write-Host "no matching backup items"
+}
+
+$rCloneBackupItems = $backupItems | ForEach-Object { [RCloneBackupItem] @{
+    Operation = $_.Operation
+    Path = $_.Path
+    NewPath = $_.NewPath
+}}
+
+# relative paths in targets should start in base folder
 Push-Location "$PSScriptRoot/.."
 
-rcloneGroup `
-    -GroupName $GroupName `
-    -SourceName $SourceName `
-    -RemoteName $RemoteName `
-    -Filter $Filter `
-    -Restore:$Restore `
-    -CopyLinks:$CopyLinks `
-    -DryRun:$DryRun `
-    -WhatIf:$WhatIf
+foreach ($backup in $backups) {
+    $rCloneBackup = [RCloneBackup] @{
+        Source = $backup.Source
+        Remote = $backup.Remote
+        RemotePath = $backup.RemotePath
+        Items = $rCloneBackupItems
+    }
 
-$global:PROFILE_ASSETS_DIR = $old_profile_assets_dir
+    Invoke-RCloneBackup `
+        -Backup $rCloneBackup `
+        -Restore:$Restore `
+        -CopyLinks:$CopyLinks `
+        -DryRun:$DryRun `
+        -AsSudo:$AsSudo `
+        -WhatIf:$WhatIf
+}
 
 Pop-Location
