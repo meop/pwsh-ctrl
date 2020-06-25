@@ -37,25 +37,25 @@ Remove the `-WhatIf` flag to really run the commands
 
 Allowing GroupName to default to os id
 
-> envfiles.ps1 -WhatIf
+> Invoke-Settings -WhatIf
 
 Specifying a GroupName
 
-> envfiles.ps1 -GroupName some_other_csv_config_name -WhatIf
+> Invoke-Settings -GroupName some_other_csv_config_name -WhatIf
 
 Specifying an RClone remote
 
-> envfiles.ps1 -RemoteName onedrive -WhatIf
+> Invoke-Settings -RemoteName onedrive -WhatIf
 
 ## Restoring
 
 Restoring backups, ie. changing the direction of the operation
 
-> envfiles.ps1 -Restore -WhatIf
+> Invoke-Settings -Restore -WhatIf
 
 Restoring backups selectively
 
-> envfiles.ps1 -Restore -Filter iis -WhatIf
+> Invoke-Settings -Restore -Filter iis -WhatIf
 
 
 # Advanced

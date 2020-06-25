@@ -1,5 +1,2 @@
-# ignore assets so people can create their own
-**/assets/
-
-# ignore the example dump
-**/costar/
+# ignore so people can create their own
+**/assets

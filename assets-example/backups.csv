@@ -1,3 +1,0 @@
-Group,Source,Remote,RemotePath
-windows,local,local,$env:USERPROFILE/.envfiles/costar/windows
-windows,local,onedrive,/envfiles/costar/windows

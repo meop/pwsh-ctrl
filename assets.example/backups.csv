@@ -1,0 +1,3 @@
+Group,Source,Remote,RemotePath
+windows,local,onedrive,/settings/costar/windows
+dotfiles,local,local,$env:USERPROFILE/settings/dotfiles
