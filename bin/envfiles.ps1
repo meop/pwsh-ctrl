@@ -32,20 +32,20 @@ if (-not $backupItems) {
 }
 
 $rCloneBackupItems = $backupItems | ForEach-Object { [RCloneBackupItem] @{
-    Operation = $_.Operation
-    Path = $_.Path
-    NewPath = $_.NewPath
-}}
+        Operation = $_.Operation
+        Path      = $_.Path
+        NewPath   = $_.NewPath
+    } }
 
 # relative paths in targets should start in base folder
 Push-Location "$PSScriptRoot/.."
 
 foreach ($backup in $backups) {
     $rCloneBackup = [RCloneBackup] @{
-        Source = $backup.Source
-        Remote = $backup.Remote
+        Source     = $backup.Source
+        Remote     = $backup.Remote
         RemotePath = $backup.RemotePath
-        Items = $rCloneBackupItems
+        Items      = $rCloneBackupItems
     }
 
     Invoke-RCloneBackup `
