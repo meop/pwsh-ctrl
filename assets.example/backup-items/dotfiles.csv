@@ -1,3 +1,0 @@
-Operation,Path,NewPath
-copyto,$env:USERPROFILE/_vimrc,.vimrc
-copyto,$env:USERPROFILE/.minttyrc,.minttyrc
