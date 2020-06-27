@@ -1,0 +1,16 @@
+Operation,Path,NewPath,CopyLinks,AsSudo
+copyto,/etc/fstab,,,true
+copyto,/etc/makepkg.conf,,,true
+copyto,/etc/mkinitcpio.conf,,,true
+copyto,/etc/nsswitch.conf,,,true
+copyto,/etc/pacman.conf,,,true
+sync,/etc/default,,,true
+sync,/etc/grub.d,,,true
+sync,/etc/lxc,,,true
+sync,/etc/mkinitcpio.d,,,true
+sync,/etc/pacman.d,,,true
+sync,/etc/polkit-1/rules.d,,,true
+sync,/etc/pulse,,,true
+sync,/etc/sysctl.d,,,true
+sync,/etc/systemd,,,true
+sync,$env:HOME/scripts,,,

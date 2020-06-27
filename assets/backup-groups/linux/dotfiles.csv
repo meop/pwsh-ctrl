@@ -1,3 +1,12 @@
 Operation,Path,NewPath,CopyLinks,AsSudo
+copyto,$env:HOME/.config/transmission/settings.json,transmission/settings.json,,
+copyto,$env:HOME/.config/yakuakerc,yakuakerc,,
 copyto,$env:HOME/.minttyrc,.minttrc,,
+copyto,$env:HOME/.rtorrent.rc,.rtorrent.rc,,
+copyto,$env:HOME/.tmux.conf,.tmux.conf,,
 copyto,$env:HOME/.vimrc,.vimrc,,
+copyto,$env:HOME/.xinitrc,.xinitrc,,
+copyto,$env:HOME/.zshrc,.zshrc,,
+sync,$env:HOME/.local/share/konsole,konsole,,
+sync,$env:HOME/.vnc,.vnc,,
+sync,$env:HOME/.zsh,.zsh,,

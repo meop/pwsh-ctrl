@@ -1,5 +1,11 @@
 Operation,Path,NewPath,CopyLinks,AsSudo
 copyto,$env:APPDATA/ConEmu.xml,,,
+copyto,$env:APPDATA/Nuget/NuGet.Config,,,
 copyto,$env:LOCALAPPDATA/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json,,,
 copyto,$env:USERPROFILE/.config/rclone/rclone.conf,,,
+copyto,$env:USERPROFILE/.gitconfig,,,
+copyto,$env:USERPROFILE/.kdiff3rc,,,
+copyto,$env:USERPROFILE/.npmrc,,,
 copyto,$env:USERPROFILE/.ssh/config,,,
+copyto,$env:USERPROFILE/.yarnrc,,,
+copyto,$env:USERPROFILE/Viasfora/viasfora.xml,,,
