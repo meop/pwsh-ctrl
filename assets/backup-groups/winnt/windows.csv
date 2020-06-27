@@ -1,0 +1,5 @@
+Operation,Path,NewPath,CopyLinks,AsSudo
+copyto,$env:APPDATA/ConEmu.xml,,,
+copyto,$env:LOCALAPPDATA/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json,,,
+copyto,$env:USERPROFILE/.config/rclone/rclone.conf,,,
+copyto,$env:USERPROFILE/.ssh/config,,,

@@ -43,28 +43,11 @@ function Invoke-DotFiles (
     , [Parameter(Mandatory = $false)] [switch] $Gather
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
-    $GroupName = 'dotfiles'
-
-    $backups = Get-Backups `
-        -GroupName $GroupName `
-        -SourceFilter $BackupSourceFilter `
-        -RemoteFilter $BackupRemoteFilter
-
-    if (-not $backups) {
-        Write-Host "no matching backups"
-    }
-
-    $backupGroups = Get-BackupGroups `
-        -GroupName $GroupName `
-        -PathFilter $BackupGroupsPathFilter
-
-    if (-not $backupGroups) {
-        Write-Host "no matching backup groups"
-    }
-
-    Invoke-RClone `
-        -Backups $backups `
-        -BackupGroups $backupGroups `
+    Invoke-Backups `
+        -GroupName 'dotfiles' `
+        -BackupSourceFilter $BackupSourceFilter `
+        -BackupRemoteFilter $BackupRemoteFilter `
+        -BackupGroupsPathFilter $BackupGroupsPathFilter `
         -Restore:$($Gather.IsPresent ? $false : $true) `
         -WhatIf:$WhatIf
 }
@@ -96,19 +79,6 @@ function Invoke-Backups (
         Write-Host "no matching backup groups"
     }
 
-    Invoke-RClone `
-        -Backups $backups `
-        -BackupGroups $backupGroups `
-        -Restore:$Restore `
-        -WhatIf:$WhatIf
-}
-
-function Invoke-RClone (
-    $Backups
-    , $BackupGroups
-    , $Restore
-    , $WhatIf
-) {
     $rCloneBackupItems = $BackupGroups | ForEach-Object {
         [RCloneBackupItem] @{
             Operation = $_.Operation
