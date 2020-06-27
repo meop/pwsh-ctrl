@@ -1,13 +1,11 @@
-$SETTINGS_ASSETS_DIR = "$PSScriptRoot/assets"
-
-function Get-RCloneBackups (
+function Get-Backups (
     [Parameter(Mandatory = $true)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $SourceFilter
     , [Parameter(Mandatory = $false)] [string] $RemoteFilter
 ) {
     $gn = $GroupName.ToLowerInvariant()
-    $x = Import-AssetCsv "$SETTINGS_ASSETS_DIR/backups.csv" |
-    Where-Object { $_.Group.ToLowerInvariant() -eq $gn }
+    $x = Import-AssetCsv "$global:SETUPS_ASSETS_DIR/backups.csv" |
+        Where-Object { $_.Group.ToLowerInvariant() -eq $gn }
 
     if ($SourceFilter) {
         $sf = $SourceFilter.ToLowerInvariant()
@@ -20,12 +18,12 @@ function Get-RCloneBackups (
     }
 }
 
-function Get-RCloneBackupItems (
+function Get-BackupGroups (
     [Parameter(Mandatory = $true)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $PathFilter
 ) {
     $gn = $GroupName.ToLowerInvariant()
-    $x = Import-AssetCsv "$SETTINGS_ASSETS_DIR/backup-items/$gn.csv"
+    $x = Import-AssetCsv "$global:SETUPS_ASSETS_DIR/backup-groups/$env:OS_KERNEL/$gn.csv"
 
     if ($PathFilter) {
         $pf = $PathFilter.ToLowerInvariant()
@@ -38,21 +36,16 @@ function Get-RCloneBackupItems (
     }
 }
 
-function Invoke-Settings (
-    [Parameter(Mandatory = $false)] [string] $GroupName
-    , [Parameter(Mandatory = $false)] [string] $BackupSourceFilter
+function Invoke-DotFiles (
+    [Parameter(Mandatory = $false)] [string] $BackupSourceFilter
     , [Parameter(Mandatory = $false)] [string] $BackupRemoteFilter
-    , [Parameter(Mandatory = $false)] [string] $BackupItemsPathFilter
-    , [Parameter(Mandatory = $false)] [switch] $Restore
-    , [Parameter(Mandatory = $false)] [switch] $CopyLinks
-    , [Parameter(Mandatory = $false)] [switch] $DryRun
-    , [Parameter(Mandatory = $false)] [switch] $AsSudo
+    , [Parameter(Mandatory = $false)] [string] $BackupGroupsPathFilter
+    , [Parameter(Mandatory = $false)] [switch] $Gather
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
+    $GroupName = 'dotfiles'
 
-    if (-not $GroupName) { $GroupName = $env:OS_ID }
-
-    $backups = Get-RCloneBackups `
+    $backups = Get-Backups `
         -GroupName $GroupName `
         -SourceFilter $BackupSourceFilter `
         -RemoteFilter $BackupRemoteFilter
@@ -61,26 +54,75 @@ function Invoke-Settings (
         Write-Host "no matching backups"
     }
 
-    $backupItems = Get-RCloneBackupItems `
+    $backupGroups = Get-BackupGroups `
         -GroupName $GroupName `
-        -PathFilter $BackupItemsPathFilter
+        -PathFilter $BackupGroupsPathFilter
 
-    if (-not $backupItems) {
-        Write-Host "no matching backup items"
+    if (-not $backupGroups) {
+        Write-Host "no matching backup groups"
     }
 
-    $rCloneBackupItems = $backupItems | ForEach-Object {
+    Invoke-RClone `
+        -Backups $backups `
+        -BackupGroups $backupGroups `
+        -Restore:$($Gather.IsPresent ? $false : $true) `
+        -WhatIf:$WhatIf
+}
+
+function Invoke-Backups (
+    [Parameter(Mandatory = $false)] [string] $GroupName
+    , [Parameter(Mandatory = $false)] [string] $BackupSourceFilter
+    , [Parameter(Mandatory = $false)] [string] $BackupRemoteFilter
+    , [Parameter(Mandatory = $false)] [string] $BackupGroupsPathFilter
+    , [Parameter(Mandatory = $false)] [switch] $Restore
+    , [Parameter(Mandatory = $false)] [switch] $WhatIf
+) {
+    if (-not $GroupName) { $GroupName = $env:OS_ID }
+
+    $backups = Get-Backups `
+        -GroupName $GroupName `
+        -SourceFilter $BackupSourceFilter `
+        -RemoteFilter $BackupRemoteFilter
+
+    if (-not $backups) {
+        Write-Host "no matching backups"
+    }
+
+    $backupGroups = Get-BackupGroups `
+        -GroupName $GroupName `
+        -PathFilter $BackupGroupsPathFilter
+
+    if (-not $backupGroups) {
+        Write-Host "no matching backup groups"
+    }
+
+    Invoke-RClone `
+        -Backups $backups `
+        -BackupGroups $backupGroups `
+        -Restore:$Restore `
+        -WhatIf:$WhatIf
+}
+
+function Invoke-RClone (
+    $Backups
+    , $BackupGroups
+    , $Restore
+    , $WhatIf
+) {
+    $rCloneBackupItems = $BackupGroups | ForEach-Object {
         [RCloneBackupItem] @{
             Operation = $_.Operation
             Path      = $_.Path
             NewPath   = $_.NewPath
+            CopyLinks = $_.CopyLinks ? [System.Convert]::ToBoolean($_.CopyLinks) : $false
+            AsSudo    = $_.AsSudo ? [System.Convert]::ToBoolean($_.AsSudo) : $false
         }
     }
 
     # relative paths in targets should start in base folder
     Push-Location "$PSScriptRoot/.."
 
-    foreach ($backup in $backups) {
+    foreach ($backup in $Backups) {
         $rCloneBackup = [RCloneBackup] @{
             Source     = $backup.Source
             Remote     = $backup.Remote
@@ -91,13 +133,10 @@ function Invoke-Settings (
         Invoke-RCloneBackup `
             -Backup $rCloneBackup `
             -Restore:$Restore `
-            -CopyLinks:$CopyLinks `
-            -DryRun:$DryRun `
-            -AsSudo:$AsSudo `
             -WhatIf:$WhatIf
     }
 
     Pop-Location
 }
 
-Export-ModuleMember -Function Invoke-Settings
+Export-ModuleMember -Function Invoke-DotFiles, Invoke-Backups

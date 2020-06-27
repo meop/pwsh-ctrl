@@ -1,3 +1,4 @@
-Import-Module "$PSScriptRoot\settings.psm1"
+Import-Module "$PSScriptRoot/backups.psm1"
+Import-Module "$PSScriptRoot/packages.psm1"
 
-Set-Alias -Name settings -Value Invoke-Settings
+$global:SETUPS_ASSETS_DIR = "$PSScriptRoot/assets"

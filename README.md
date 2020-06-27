@@ -2,16 +2,10 @@
 
 Install PowerShell profile project
 
-https://tfs.prd.costargroup.com/CostarCollection/CoStarSuite-Git/_git/analytics-profile-pwsh
+https://github.com/meop/profile-pwsh.git
 
 
 # Setup
-
-Make a copy of the assets directory so that you have your own directory in parallel, ie:
-
-> pseudo: cp -r ./assets-example ./assets
-
-Copy the Initializers file to the corresponding profile folder
 
 > pseudo: cp ./Initializers/* /%userprofile%/Documents/Powershell/Initializers/
 
@@ -29,37 +23,79 @@ You can also put other rows in the file, targeting different remotes, using eith
 The library should name match and run through all the backups you define
 
 
-# Run
+# DotFiles
 
-Remove the `-WhatIf` flag to really run the commands
+## Installing
 
-## Basic
+Hardcodes GroupName to 'dotfiles'
 
-Allowing GroupName to default to os id
+> dotfiles -WhatIf
 
-> Invoke-Settings -WhatIf
+Specifying an RClone source
 
-Specifying a GroupName
-
-> Invoke-Settings -GroupName some_other_csv_config_name -WhatIf
+> dotfiles -BackupSourceFilter local -WhatIf
 
 Specifying an RClone remote
 
-> Invoke-Settings -RemoteName onedrive -WhatIf
+> dotfiles -BackupRemoteFilter onedrive -WhatIf
+
+Being selective
+
+> dotfiles -BackupGroupsPathFilter term -WhatIf
+
+## Gathering
+
+Reverse, gather dotfiles
+
+> dotfiles -Gather -WhatIf
+
+You can also use the same filters as above
+
+
+# Backups
+
+Remove the `-WhatIf` flag to really run the commands
+
+## Copying files / Syncing folders
+
+Defaults GroupName to $env:OS_ID
+
+> backups -WhatIf
+
+Specifying GroupName
+
+> backups -GroupName some_other_csv_config_name -WhatIf
+
+Specifying an RClone source
+
+> backups -BackupSourceFilter local -WhatIf
+
+Specifying an RClone remote
+
+> backups -BackupRemoteFilter onedrive -WhatIf
+
+Being selective
+
+> backups -BackupGroupsPathFilter term -WhatIf
 
 ## Restoring
 
 Restoring backups, ie. changing the direction of the operation
 
-> Invoke-Settings -Restore -WhatIf
+> backups -Restore -WhatIf
 
-Restoring backups selectively
+You can also use the same filters as above
 
-> Invoke-Settings -Restore -Filter iis -WhatIf
+
+# Packages
+
+Defaults GroupName to $env:HOSTNAME
+
+> packages -WhatIf
+
+> packages -GroupName something_else -WhatIf
 
 
 # Advanced
 
-There are a few of other flags that the library wrapping RClone supports, like symlinks, etc.. so feel free to explore
-
-You could also set up the binary to run on a schedule in your OS with some arguments, to automate backups
+These are all on-demand examples, but you could also setup scripts to run using a task scheduler
