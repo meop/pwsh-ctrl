@@ -4,6 +4,7 @@ copyto,/etc/makepkg.conf,,,true
 copyto,/etc/mkinitcpio.conf,,,true
 copyto,/etc/nsswitch.conf,,,true
 copyto,/etc/pacman.conf,,,true
+copyto,$env:HOME/.config/transmission/settings.json,transmission/settings.json,,
 sync,/etc/default,,,true
 sync,/etc/grub.d,,,true
 sync,/etc/lxc,,,true
