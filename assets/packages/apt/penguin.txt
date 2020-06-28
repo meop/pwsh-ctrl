@@ -1,0 +1,4 @@
+gawk
+tmux
+vim-gtk3
+zsh
