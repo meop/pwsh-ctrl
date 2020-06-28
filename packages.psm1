@@ -19,6 +19,7 @@ function Invoke-Packages (
     if (-not $GroupName) { $GroupName = $env:HOSTNAME }
 
     if (Test-Command 'apt') {
+        $sudo = $true
         $pm = 'apt'
         $inst = "install"
     }
@@ -44,7 +45,7 @@ function Invoke-Packages (
     }
 
     $command = Get-ConsoleCommand `
-        -Line "$pm $inst $($packages -join ' ')"
+        -Line "$($sudo ? 'sudo ' : '')$pm $inst $($packages -join ' ')"
 
     Invoke-CommandsConcurrent `
         -Commands $command `
