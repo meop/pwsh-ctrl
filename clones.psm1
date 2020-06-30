@@ -38,25 +38,20 @@ function Get-DotFileItems (
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/dotfile-groups/$group.csv"
 }
 
-function Invoke-Backups (
-    [Parameter(Mandatory = $false)] [string] $GroupName
+function Select-Groups (
+    [Parameter(Mandatory = $false)] [CloneGroup[]] $Groups
     , [Parameter(Mandatory = $false)] [string] $SourceFilter
     , [Parameter(Mandatory = $false)] [string] $RemoteFilter
-    , [Parameter(Mandatory = $false)] [string] $ItemsPathFilter
-    , [Parameter(Mandatory = $false)] [switch] $Restore
-    , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
-    $cloneGroups = Get-CloneGroups $GroupName
-    $cloneItems = Get-BackupItems $GroupName
-
-    Invoke-RCloneItems `
-        -CloneGroups $cloneGroups `
-        -CloneItems $cloneItems `
-        -SourceFilter $SourceFilter `
-        -RemoteFilter $RemoteFilter `
-        -ItemsPathFilter $ItemsPathFilter `
-        -Restore:$Restore `
-        -WhatIf:$WhatIf
+    if ($SourceFilter) {
+        $sf = $SourceFilter.ToLowerInvariant()
+        $Groups | Where-Object { $_.Source -and $_.Source.ToLowerInvariant().Contains($sf) }
+    } elseif ($RemoteFilter) {
+        $rf = $RemoteFilter.ToLowerInvariant()
+        $Groups | Where-Object { $_.Remote -and $_.Remote.ToLowerInvariant().Contains($rf) }
+    } else {
+        $Groups
+    }
 }
 
 function Initialize-DotFilePlugins (
@@ -111,72 +106,77 @@ function Initialize-DotFilePlugins (
     }
 }
 
-function Invoke-DotFiles (
-    [Parameter(Mandatory = $false)] [string] $SourceFilter
-    , [Parameter(Mandatory = $false)] [string] $RemoteFilter
-    , [Parameter(Mandatory = $false)] [string] $ItemsPathFilter
-    , [Parameter(Mandatory = $false)] [switch] $Gather
-    , [Parameter(Mandatory = $false)] [switch] $WhatIf
+function Select-Items (
+    [Parameter(Mandatory = $false)] [CloneItem[]] $Items
+    , [Parameter(Mandatory = $false)] [string] $PathFilter
 ) {
-    $cloneGroups = Get-CloneGroups 'dotfiles'
-    $cloneItems = Get-DotFileItems $null
-
-    if (-not $WhatIf.IsPresent) {
-        Initialize-DotFilePlugins $cloneItems
-    }
-
-    Invoke-RCloneItems `
-        -CloneGroups $cloneGroups `
-        -CloneItems $cloneItems `
-        -SourceFilter $SourceFilter `
-        -RemoteFilter $RemoteFilter `
-        -ItemsPathFilter $ItemsPathFilter `
-        -Restore:$($Gather.IsPresent ? $false : $true) `
-        -WhatIf:$WhatIf
-}
-
-function Invoke-RCloneItems (
-    [Parameter(Mandatory = $false)] [CloneGroup[]] $CloneGroups
-    , [Parameter(Mandatory = $false)] [CloneItem[]] $CloneItems
-    , [Parameter(Mandatory = $false)] [string] $SourceFilter
-    , [Parameter(Mandatory = $false)] [string] $RemoteFilter
-    , [Parameter(Mandatory = $false)] [string] $ItemsPathFilter
-    , [Parameter(Mandatory = $false)] [switch] $Restore
-    , [Parameter(Mandatory = $false)] [switch] $WhatIf
-) {
-    $CloneGroups =
-    if ($SourceFilter) {
-        $sf = $SourceFilter.ToLowerInvariant()
-        $CloneGroups | Where-Object { $_.Source -and $_.Source.ToLowerInvariant().Contains($sf) }
-    } elseif ($RemoteFilter) {
-        $rf = $RemoteFilter.ToLowerInvariant()
-        $CloneGroups | Where-Object { $_.Remote -and $_.Remote.ToLowerInvariant().Contains($rf) }
-    } else {
-        $CloneGroups
-    }
-
-    $CloneItems =
-    if ($ItemsPathFilter) {
-        $pf = $ItemsPathFilter.ToLowerInvariant()
-        $CloneItems | Where-Object {
+    if ($PathFilter) {
+        $pf = $PathFilter.ToLowerInvariant()
+        $Items | Where-Object {
             ($_.Path -and $_.Path.ToLowerInvariant().Contains($pf)) -or
             ($_.NewPath -and $_.NewPath.ToLowerInvariant().Contains($pf))
         }
     } else {
-        $CloneItems
+        $Items
     }
+}
 
-    if (-not $CloneGroups) {
+function Invoke-Backups (
+    [Parameter(Mandatory = $false)] [string] $GroupName
+    , [Parameter(Mandatory = $false)] [string] $SourceFilter
+    , [Parameter(Mandatory = $false)] [string] $RemoteFilter
+    , [Parameter(Mandatory = $false)] [string] $ItemPathFilter
+    , [Parameter(Mandatory = $false)] [switch] $Restore
+    , [Parameter(Mandatory = $false)] [switch] $WhatIf
+) {
+    $groups = Select-Groups (Get-CloneGroups $GroupName) $SourceFilter $RemoteFilter
+    $items = Select-Items (Get-BackupItems $GroupName) $ItemPathFilter
+
+    Invoke-RCloneItems `
+        -Groups $groups `
+        -Items $items `
+        -Restore:$Restore `
+        -WhatIf:$WhatIf
+}
+
+function Invoke-DotFiles (
+    [Parameter(Mandatory = $false)] [string] $SourceFilter
+    , [Parameter(Mandatory = $false)] [string] $RemoteFilter
+    , [Parameter(Mandatory = $false)] [string] $ItemPathFilter
+    , [Parameter(Mandatory = $false)] [switch] $Gather
+    , [Parameter(Mandatory = $false)] [switch] $WhatIf
+) {
+    $groups = Select-Groups (Get-CloneGroups 'dotfiles') $SourceFilter $RemoteFilter
+    $items = Select-Items (Get-DotFileItems $null) $ItemPathFilter
+
+    Invoke-RCloneItems `
+        -Groups $groups `
+        -Items $items `
+        -Restore:$(-not $Gather.IsPresent) `
+        -WhatIf:$WhatIf
+
+    if (-not $WhatIf.IsPresent) {
+        Initialize-DotFilePlugins $items
+    }
+}
+
+function Invoke-RCloneItems (
+    [Parameter(Mandatory = $false)] [CloneGroup[]] $Groups
+    , [Parameter(Mandatory = $false)] [CloneItem[]] $Items
+    , [Parameter(Mandatory = $false)] [switch] $Restore
+    , [Parameter(Mandatory = $false)] [switch] $WhatIf
+) {
+    if (-not $Groups) {
         Write-Host "no matching clone groups found.."
         return
     }
 
-    if (-not $CloneItems) {
+    if (-not $Items) {
         Write-Host "no matching clone items found.."
         return
     }
 
-    $rCloneItems = $CloneItems | ForEach-Object {
+    $rCloneItems = $Items | ForEach-Object {
         [RCloneItem] @{
             Operation = $_.Operation
             Path      = $_.Path
@@ -189,11 +189,11 @@ function Invoke-RCloneItems (
     # relative paths in targets should start in base folder
     Push-Location "$PSScriptRoot/.."
 
-    foreach ($cloneGroup in $cloneGroups) {
+    foreach ($group in $Groups) {
         $rCloneParameters = [RCloneParameters] @{
-            Source     = $cloneGroup.Source
-            Remote     = $cloneGroup.Remote
-            RemotePath = $cloneGroup.RemotePath
+            Source     = $group.Source
+            Remote     = $group.Remote
+            RemotePath = $group.RemotePath
         }
 
         Invoke-RClone `
