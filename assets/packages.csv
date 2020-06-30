@@ -1,6 +1,6 @@
-Group,Manager,InstallFlags,AsSudo
-windows,choco,install,
-macos,brew,install,
-arch,yay,-S,
-debian,apt,install,true
-raspbian,apt,install,true
+Group,Manager,InstallFlags,UpgradeFlags,ListFlags,CleanupFlags,AsSudo
+windows,choco,install,upgrade all,list --local,,
+macos,brew,install,upgrade,list,cleanup,
+arch,yay,-S,-Syu,-Q,-Sc,
+debian,apt,install,update && apt upgrade,list --installed,autoclean && apt autoremove,true
+raspbian,apt,install,update && apt upgrade,list --installed,autoclean && apt autoremove,true

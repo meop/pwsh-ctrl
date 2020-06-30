@@ -47,12 +47,12 @@ function Initialize-PackageManager (
 function Get-PackageGroup {
     $group = ($env:OSID).ToLowerInvariant()
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/packages.csv" |
-    Where-Object { $_.Group.ToLowerInvariant() -eq $group } |
-    Select-Object -First 1
+        Where-Object { $_.Group.ToLowerInvariant() -eq $group } |
+        Select-Object -First 1
 }
 
 function Get-Packages (
-    [Parameter(Mandatory = $true)] [string] $GroupName
+    [Parameter(Mandatory = $false)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $Manager
 ) {
     if (-not $GroupName) { $GroupName = $env:HOSTNAME }
@@ -63,12 +63,18 @@ function Get-Packages (
     Import-AssetList "$global:SETUPS_ASSETS_DIR/package-groups/$manager/$group.txt"
 }
 
+enum PackagesOperation {
+    upgrade
+    cleanup
+    install
+    list
+}
+
 function Invoke-Packages (
-    [Parameter(Mandatory = $false)] [string] $GroupName
+    [Parameter(Mandatory = $false)] [PackagesOperation] $Operation = [PackagesOperation]::upgrade
+    , [Parameter(Mandatory = $false)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
-    if (-not $GroupName) { $GroupName = $env:HOSTNAME }
-
     $packageGroup = Get-PackageGroup
 
     if (-not $packageGroup -or -not $packageGroup.Manager) {
@@ -76,19 +82,32 @@ function Invoke-Packages (
         return
     }
 
-    $packages = Get-Packages $GroupName $packageGroup.Manager
-
-    if (-not $packages) {
-        Write-Host 'no matching packages found..'
-        return
-    }
-
     if (-not $WhatIf.IsPresent) {
         Initialize-PackageManager $packageGroup.Manager
     }
 
+    $flags = switch ($Operation) {
+        ([PackagesOperation]::upgrade) { $packageGroup.UpgradeFlags }
+        ([PackagesOperation]::cleanup) { $packageGroup.CleanupFlags }
+        ([PackagesOperation]::install) { $packageGroup.InstallFlags }
+        ([PackagesOperation]::list) { $packageGroup.ListFlags }
+    }
+
+    if (([PackagesOperation]::install) -eq $Operation) {
+        $packages = Get-Packages $GroupName $packageGroup.Manager
+        if (-not $packages) {
+            Write-Host 'no matching packages found..'
+            return
+        }
+    }
+
+    if (-not $flags) {
+        Write-Host "no matching operation '$Operation' for manager '$($packageGroup.Manager)'.."
+        return
+    }
+
     $command = Get-ConsoleCommand `
-        -Line "$($packageGroup.AsSudo ? 'sudo ' : '')$($packageGroup.Manager) $($packageGroup.InstallFlags) $($packages -join ' ')"
+        -Line "$($packageGroup.AsSudo ? 'sudo ' : '')$($packageGroup.Manager) $flags $($packages -join ' ')"
 
     Invoke-CommandsConcurrent `
         -Commands $command `
