@@ -73,7 +73,7 @@ function Initialize-DotFilePlugins (
         switch ($n) {
             'vim-plug' {
                 (($IsWindows -and -not (Test-Path "$env:HOME/vimfiles/autoload/plug.vim")) -or
-                 (-not $IsWindows -and -not (Test-Path "$env:HOME/.vim/autoload.plug.vim")))
+                 (-not $IsWindows -and -not (Test-Path "$env:HOME/.vim/autoload/plug.vim")))
             }
             'tpm' {
                 (-not $IsWindows -and -not (Test-Path "$env:HOME/.tmux/plugins/tpm"))
