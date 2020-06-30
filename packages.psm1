@@ -1,5 +1,5 @@
 class PackageGroup {
-    [string] $Group
+    [string] $GroupName
     [string] $Manager
     [string] $InstallFlags
     [bool] $AsSudo
@@ -55,27 +55,27 @@ function Initialize-PackageManager (
 function Get-PackageGroup {
     $group = ($env:OSID).ToLowerInvariant()
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/packages.csv" |
-        Where-Object { $_.Group.ToLowerInvariant() -eq $group } |
-        Select-Object -First 1
+    Where-Object { $_.Group.ToLowerInvariant() -eq $group } |
+    Select-Object -First 1
 }
 
 function Get-Packages (
-    [Parameter(Mandatory = $true)] [string] $Group
+    [Parameter(Mandatory = $true)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $Manager
 ) {
-    if (-not $Group) { $Group = $env:HOSTNAME}
+    if (-not $GroupName) { $GroupName = $env:HOSTNAME }
 
-    $group = $Group.ToLowerInvariant()
+    $group = $GroupName.ToLowerInvariant()
     $manager = $Manager.ToLowerInvariant()
 
     Import-AssetList "$global:SETUPS_ASSETS_DIR/package-groups/$manager/$group.txt"
 }
 
 function Invoke-Packages (
-    [Parameter(Mandatory = $false)] [string] $Group
+    [Parameter(Mandatory = $false)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
-    if (-not $Group) { $Group = $env:HOSTNAME }
+    if (-not $GroupName) { $GroupName = $env:HOSTNAME }
 
     $packageGroup = Get-PackageGroup
 
@@ -84,7 +84,7 @@ function Invoke-Packages (
         return
     }
 
-    $packages = Get-Packages $Group $packageGroup.Manager
+    $packages = Get-Packages $GroupName $packageGroup.Manager
 
     if (-not $packages) {
         Write-Host 'no matching packages found..'

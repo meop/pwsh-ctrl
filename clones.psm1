@@ -1,5 +1,5 @@
 class CloneGroup {
-    [string] $Group
+    [string] $GroupName
     [string] $Source
     [string] $Remote
     [string] $RemotePath
@@ -14,27 +14,27 @@ class CloneItem {
 }
 
 function Get-CloneGroups (
-    [Parameter(Mandatory = $false)] [string] $Group
+    [Parameter(Mandatory = $false)] [string] $GroupName
 ) {
-    if (-not $Group) { $Group = $env:OSID }
-    $Group = $Group.ToLowerInvariant()
+    if (-not $GroupName) { $GroupName = $env:OSID }
+    $GroupName = $GroupName.ToLowerInvariant()
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/clones.csv" |
-        Where-Object { $_.Group.ToLowerInvariant() -eq $Group }
+    Where-Object { $_.Group.ToLowerInvariant() -eq $GroupName }
 }
 
 function Get-BackupItems (
-    [Parameter(Mandatory = $false)] [string] $Group
+    [Parameter(Mandatory = $false)] [string] $GroupName
 ) {
-    if (-not $Group) { $Group = $env:OSID }
-    $group = $Group.ToLowerInvariant()
+    if (-not $GroupName) { $GroupName = $env:OSID }
+    $group = $GroupName.ToLowerInvariant()
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/backup-groups/$group.csv"
 }
 
 function Get-DotFileItems (
-    [Parameter(Mandatory = $false)] [string] $Group
+    [Parameter(Mandatory = $false)] [string] $GroupName
 ) {
-    if (-not $Group) { $Group = ($IsWindows ? 'windows' : $IsMacOS ? 'macos' : 'linux') }
-    $group = $Group.ToLowerInvariant()
+    if (-not $GroupName) { $GroupName = ($IsWindows ? 'windows' : $IsMacOS ? 'macos' : 'linux') }
+    $group = $GroupName.ToLowerInvariant()
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/dotfile-groups/$group.csv"
 }
 
@@ -47,15 +47,15 @@ function Initialize-DotFilePlugins (
 }
 
 function Invoke-Backups (
-    [Parameter(Mandatory = $false)] [string] $Group
+    [Parameter(Mandatory = $false)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $SourceFilter
     , [Parameter(Mandatory = $false)] [string] $RemoteFilter
     , [Parameter(Mandatory = $false)] [string] $ItemsPathFilter
     , [Parameter(Mandatory = $false)] [switch] $Restore
     , [Parameter(Mandatory = $false)] [switch] $WhatIf
 ) {
-    $cloneGroups = Get-CloneGroups $Group
-    $cloneItems = Get-BackupItems $Group
+    $cloneGroups = Get-CloneGroups $GroupName
+    $cloneItems = Get-BackupItems $GroupName
 
     Invoke-RCloneItems `
         -CloneGroups $cloneGroups `

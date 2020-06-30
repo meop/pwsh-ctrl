@@ -26,3 +26,5 @@ function Update-Setups (
 
     Pop-Location
 }
+
+Export-ModuleMember -Function Update-Setups

@@ -9,7 +9,6 @@ Set-Alias -Name dotfiles -Value Invoke-DotFiles
 
 Import-Module "$PSScriptRoot/packages.psm1"
 
-Set-Alias -Name prepare -Value Initialize-Packages
 Set-Alias -Name packages -Value Invoke-Packages
 
 $global:SETUPS_ASSETS_DIR = "$PSScriptRoot/assets"

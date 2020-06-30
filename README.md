@@ -27,21 +27,21 @@ The library should name match and run through all the backups you define
 
 ## Installing
 
-Hardcodes GroupName to 'dotfiles'
+Hardcodes Group to 'dotfiles'
 
 > dotfiles -WhatIf
 
 Specifying an RClone source
 
-> dotfiles -BackupSourceFilter local -WhatIf
+> dotfiles -SourceFilter local -WhatIf
 
 Specifying an RClone remote
 
-> dotfiles -BackupRemoteFilter onedrive -WhatIf
+> dotfiles -RemoteFilter onedrive -WhatIf
 
 Being selective
 
-> dotfiles -BackupGroupsPathFilter term -WhatIf
+> dotfiles -ItemsPathFilter term -WhatIf
 
 ## Gathering
 
@@ -58,25 +58,25 @@ Remove the `-WhatIf` flag to really run the commands
 
 ## Copying files / Syncing folders
 
-Defaults GroupName to $env:OSID
+Defaults Group to $env:OSID
 
 > backups -WhatIf
 
-Specifying GroupName
+Specifying Group
 
 > backups -GroupName some_other_csv_config_name -WhatIf
 
 Specifying an RClone source
 
-> backups -BackupSourceFilter local -WhatIf
+> backups -SourceFilter local -WhatIf
 
 Specifying an RClone remote
 
-> backups -BackupRemoteFilter onedrive -WhatIf
+> backups -RemoteFilter onedrive -WhatIf
 
 Being selective
 
-> backups -BackupGroupsPathFilter term -WhatIf
+> backups -ItemsPathFilter term -WhatIf
 
 ## Restoring
 
@@ -89,7 +89,7 @@ You can also use the same filters as above
 
 # Packages
 
-Defaults GroupName to $env:HOSTNAME
+Defaults Group to $env:HOSTNAME
 
 > packages -WhatIf
 
