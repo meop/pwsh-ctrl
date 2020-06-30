@@ -1,6 +1,0 @@
-Group,Source,Remote,RemotePath
-dotfiles,local,local,$env:HOME/setups/dotfiles
-arch,local,onedrive,/backups/$env:OS_KERNEL/$env:OS_ID/arch
-debian,local,onedrive,/backups/$env:OS_KERNEL/$env:OS_ID/debian
-raspbian,local,onedrive,/backups/$env:OS_KERNEL/$env:OS_ID/raspbian
-windows,local,onedrive,/backups/$env:OS_KERNEL/$env:OS_ID/windows

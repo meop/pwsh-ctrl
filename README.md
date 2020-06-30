@@ -58,7 +58,7 @@ Remove the `-WhatIf` flag to really run the commands
 
 ## Copying files / Syncing folders
 
-Defaults GroupName to $env:OS_ID
+Defaults GroupName to $env:OSID
 
 > backups -WhatIf
 

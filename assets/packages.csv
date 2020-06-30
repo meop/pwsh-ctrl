@@ -1,0 +1,6 @@
+Group,Manager,InstallFlags,AsSudo
+windows,choco,install,
+macos,brew,install,
+arch,yay,-S,
+debian,apt,install,true
+raspbian,apt,install,true

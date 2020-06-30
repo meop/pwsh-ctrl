@@ -22,12 +22,12 @@ ZSH_THEME_GIT_PROMPT_UNMERGED_PREFIX=" %{$fg[red]%}%{~%G%}"
 
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg_bold[blue]%}]%{$reset_color%}"
 
-OS_ID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
+OSID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
 
 function charHost {
-    if [[ $OS_ID == 'arch' ]]; then echo '\uf303'
-    elif [[ $OS_ID == 'debian' ]]; then echo '\uf306'
-    elif [[ $OS_ID == 'raspios' ]]; then echo '\uf315'
+    if [[ $OSID == 'arch' ]]; then echo '\uf303'
+    elif [[ $OSID == 'debian' ]]; then echo '\uf306'
+    elif [[ $OSID == 'raspios' ]]; then echo '\uf315'
     else echo '\uf17c'
     fi
 }

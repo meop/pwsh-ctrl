@@ -45,7 +45,7 @@ fi
 
 export VISUAL=vim
 
-export OS_ID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
+export OSID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
 
 
 # Setup drivers
