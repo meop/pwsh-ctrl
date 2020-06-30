@@ -18,18 +18,14 @@ function Initialize-PackageManager (
         Write-HostAsk "Install missing package manager '$Manager' ([Y]es/[n]o): " `
             -NoNewline
 
-        ((Read-Host) -like '*n*')
+        ((Read-Host) -notlike '*n*')
     }
 
-    function missing ($n) {
-        ($n -eq $Manager) -and -not (Test-Command $n)
+    function missing ($o, $m) {
+        ($env:OSID -eq $o) -and ($m -eq $Manager) -and -not (Test-Command $m)
     }
 
-    if ((missing 'choco') -and
-        ($env:OSID -eq 'windows')
-    ) {
-        if (-not (confirm)) { break }
-
+    if ((missing 'windows' 'choco') -and (confirm)) {
         Set-ExecutionPolicy Bypass -Scope Process -Force
 
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -37,11 +33,7 @@ function Initialize-PackageManager (
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     }
 
-    if ((missing 'yay') -and
-        ($env:OSID -eq 'arch')
-    ) {
-        if (-not (confirm)) { break }
-
+    if ((missing 'arch' 'yay') -and (confirm)) {
         git clone 'https://aur.archlinux.org/yay-bin.git' "$env:HOME/yay-bin"
 
         Push-Location "$env:HOME/yay-bin"
@@ -91,7 +83,9 @@ function Invoke-Packages (
         return
     }
 
-    Initialize-PackageManager $packageGroup.Manager
+    if (-not $WhatIf.IsPresent) {
+        Initialize-PackageManager $packageGroup.Manager
+    }
 
     $command = Get-ConsoleCommand `
         -Line "$($packageGroup.AsSudo ? 'sudo ' : '')$($packageGroup.Manager) $($packageGroup.InstallFlags) $($packages -join ' ')"

@@ -64,24 +64,27 @@ function Initialize-DotFilePlugins (
         ((Read-Host) -notlike '*n*')
     }
 
-    function missing ($n) {
-        switch ($n) {
-            'vim-plug' {
-                (($IsWindows -and -not (Test-Path "$env:HOME/vimfiles/autoload/plug.vim")) -or
-                 (-not $IsWindows -and -not (Test-Path "$env:HOME/.vim/autoload/plug.vim")))
-            }
-            'tpm' {
-                (-not $IsWindows -and -not (Test-Path "$env:HOME/.tmux/plugins/tpm"))
-            }
-            'zplug' {
-                (-not $IsWindows -and -not (Test-Path "$env:HOME/.zplug"))
+    function missing ($ci, $p, $n) {
+        function plugin {
+            switch ($n) {
+                'vim-plug' {
+                    ( ($IsWindows -and (Test-Path "$env:HOME/vimfiles/autoload/plug.vim")) -or
+                    (-not $IsWindows -and (Test-Path "$env:HOME/.vim/autoload/plug.vim")) )
+                }
+                'tpm' {
+                    ($IsWindows -or (Test-Path "$env:HOME/.tmux/plugins/tpm"))
+                }
+                'zplug' {
+                    ($IsWindows -or (Test-Path "$env:HOME/.zplug"))
+                }
             }
         }
 
+        $ci.Path.Contains($p) -and -not (plugin)
     }
 
     foreach ($cloneItem in $CloneItems) {
-        if (($cloneItem.Path.Contains('vim')) -and (missing 'vim-plug') -and (confirm 'vim-plug')) {
+        if ((missing $cloneItem 'vim' 'vim-plug') -and (confirm 'vim-plug')) {
             $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
             if ($IsWindows) {
                 mkdir "$env:HOME/vimfiles/autoload" | Out-Null
@@ -96,11 +99,11 @@ function Initialize-DotFilePlugins (
             }
         }
 
-        if (($cloneItem.Path.Contains('tmux')) -and (missing 'tpm') -and (confirm 'tpm')) {
+        if ((missing $cloneItem 'tmux' 'tpm') -and (confirm 'tpm')) {
             git clone 'https://github.com/tmux-plugins/tpm' "$env:HOME/.tmux/plugins/tpm"
         }
 
-        if (($cloneItem.Path.Contains('zsh')) -and (missing 'zplug') -and (confirm 'zplug')) {
+        if ((missing $cloneItem 'zsh' 'zplug') -and (confirm 'zplug')) {
             git clone 'https://github.com/zplug/zplug' "$env:HOME/.zplug"
         }
     }
