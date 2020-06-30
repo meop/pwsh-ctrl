@@ -1,5 +1,5 @@
 class PackageGroup {
-    [string] $GroupName
+    [string] $Group
     [string] $Manager
     [string] $InstallFlags
     [bool] $AsSudo

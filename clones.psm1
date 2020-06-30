@@ -1,5 +1,5 @@
 class CloneGroup {
-    [string] $GroupName
+    [string] $Group
     [string] $Source
     [string] $Remote
     [string] $RemotePath
@@ -38,14 +38,6 @@ function Get-DotFileItems (
     Import-AssetCsv "$global:SETUPS_ASSETS_DIR/dotfile-groups/$group.csv"
 }
 
-function Initialize-DotFilePlugins (
-    [Parameter(Mandatory = $true)] [CloneItem] $CloneItem
-) {
-    if ($CloneItem.Path.Contains('vimrc')) {
-
-    }
-}
-
 function Invoke-Backups (
     [Parameter(Mandatory = $false)] [string] $GroupName
     , [Parameter(Mandatory = $false)] [string] $SourceFilter
@@ -67,6 +59,58 @@ function Invoke-Backups (
         -WhatIf:$WhatIf
 }
 
+function Initialize-DotFilePlugins (
+    [Parameter(Mandatory = $true)] [CloneItem[]] $CloneItems
+) {
+    function confirm ($n) {
+        Write-HostAsk "Install missing dotfile plugin '$n' ([Y]es/[n]o): " `
+            -NoNewLine
+
+        ((Read-Host) -notlike '*n*')
+    }
+
+    function missing ($n) {
+        switch ($n) {
+            'vim-plug' {
+                (($IsWindows -and -not (Test-Path "$env:HOME/vimfiles/autoload/plug.vim")) -or
+                 (-not $IsWindows -and -not (Test-Path "$env:HOME/.vim/autoload.plug.vim")))
+            }
+            'tpm' {
+                (-not $IsWindows -and -not (Test-Path "$env:HOME/.tmux/plugins/tpm"))
+            }
+            'zplug' {
+                (-not $IsWindows -and -not (Test-Path "$env:HOME/.zplug"))
+            }
+        }
+
+    }
+
+    foreach ($cloneItem in $CloneItems) {
+        if (($cloneItem.Path.Contains('vim')) -and (missing 'vim-plug') -and (confirm 'vim-plug')) {
+            $uri = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+            if ($IsWindows) {
+                mkdir "$env:HOME/vimfiles/autoload" | Out-Null
+                (New-Object Net.WebClient).DownloadFile(
+                    $uri,
+                    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                        "$env:HOME/vimfiles/autoload/plug.vim"
+                    )
+                )
+            } else {
+                curl -fLo "$env:HOME/.vim/autoload/plug.vim" --create-dirs $uri
+            }
+        }
+
+        if (($cloneItem.Path.Contains('tmux')) -and (missing 'tpm') -and (confirm 'tpm')) {
+            git clone 'https://github.com/tmux-plugins/tpm' "$env:HOME/.tmux/plugins/tpm"
+        }
+
+        if (($cloneItem.Path.Contains('zsh')) -and (missing 'zplug') -and (confirm 'zplug')) {
+            git clone 'https://github.com/zplug/zplug' "$env:HOME/.zplug"
+        }
+    }
+}
+
 function Invoke-DotFiles (
     [Parameter(Mandatory = $false)] [string] $SourceFilter
     , [Parameter(Mandatory = $false)] [string] $RemoteFilter
@@ -76,6 +120,10 @@ function Invoke-DotFiles (
 ) {
     $cloneGroups = Get-CloneGroups 'dotfiles'
     $cloneItems = Get-DotFileItems $null
+
+    if (-not $WhatIf.IsPresent) {
+        Initialize-DotFilePlugins $cloneItems
+    }
 
     Invoke-RCloneItems `
         -CloneGroups $cloneGroups `
