@@ -107,7 +107,7 @@ function Invoke-Packages (
     }
 
     $command = Get-ConsoleCommand `
-        -Line "$($packageGroup.AsSudo ? 'sudo ' : '')$($packageGroup.Manager) $flags $($packages -join ' ')"
+        -Line "$($packageGroup.AsSudo ? 'sudo sh -c ''' : '')$($packageGroup.Manager)$($flags ? " $flags" : '')$($packages ? " $($packages -join ' ')" : '')$($packageGroup.AsSudo ? '''' : '')"
 
     Invoke-CommandsConcurrent `
         -Commands $command `
