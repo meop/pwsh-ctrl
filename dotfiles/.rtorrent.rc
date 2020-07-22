@@ -1,0 +1,33 @@
+session.path.set = /opt/rtorrent/.session
+directory.default.set = /opt/rtorrent
+
+network.port_range.set = 50000-60000
+network.port_random.set = yes
+
+dht.mode.set = disable
+protocol.pex.set = yes
+trackers.use_udp.set = yes
+
+throttle.max_uploads.set = 100
+throttle.max_uploads.global.set = 250
+
+throttle.min_peers.normal.set = 20
+throttle.max_peers.normal.set = 60
+throttle.min_peers.seed.set = 30
+throttle.max_peers.seed.set = 80
+trackers.numwant.set = 80
+
+protocol.encryption.set = allow_incoming,prefer_plaintext,enable_retry
+#protocol.encryption.set = require,require_RC4,allow_incoming,try_outgoing
+
+network.http.max_open.set = 50
+network.max_open_files.set = 600
+network.max_open_sockets.set = 300
+
+pieces.memory.max.set = 1800M
+network.xmlrpc.size_limit.set = 4M
+
+encoding.add = utf8
+#system.umask.set = 0027
+#system.cwd.set = (directory.default)
+network.http.dns_cache_timeout.set = 25
