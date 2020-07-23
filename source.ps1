@@ -1,12 +1,9 @@
-$d = "$PSScriptRoot/modules"
-if (Test-Path $d) {
-    Get-ChildItem -Path $d -Filter '*.psm1' |
-    ForEach-Object { Import-Module $_.FullName }
-}
+Invoke-SafeAppendToModulePath "$PSScriptRoot/Modules"
 
-Set-Alias -Name setups -Value Update-Setups
-Set-Alias -Name backups -Value Invoke-Backups
-Set-Alias -Name dotfiles -Value Invoke-DotFiles
-Set-Alias -Name packages -Value Invoke-Packages
+$d = "$PSScriptRoot/scripts"
+if (Test-Path $d) {
+    Get-ChildItem -Path $d -Filter '*.ps1' |
+    ForEach-Object { . $_.FullName }
+}
 
 $global:SETUPS_ASSETS_DIR = "$PSScriptRoot/assets"

@@ -1,5 +1,5 @@
 Group,Source,Remote,RemotePath
-dotfiles,local,local,$env:HOME/setups/dotfiles
+dotfiles,local,local,$env:HOME/ctrl/dotfiles
 arch,local,onedrive,/backups/$env:OSID/arch
 debian,local,onedrive,/backups/$env:OSID/debian
 raspbian,local,onedrive,/backups/$env:OSID/raspbian
