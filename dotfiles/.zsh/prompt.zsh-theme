@@ -32,6 +32,9 @@ function charHost {
     elif [[ $OSID == 'raspbian' ]]; then echo '\uf315'
     elif [[ $OSID == 'ubuntu' ]]; then echo '\uf31b'
     elif [[ $OSID == 'linuxmint' ]]; then echo '\uf30e'
+    elif [[ $OSID == 'rhel' ]]; then echo '\uf316'
+    elif [[ $OSID == 'centos' ]]; then echo '\uf304'
+    elif [[ $OSID == 'fedora' ]]; then echo '\uf30a'
     else echo '\uf17c'
     fi
 }
