@@ -81,9 +81,9 @@ set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
 
 if has("gui_running")
-  set columns=180
+  set columns=160
   set lines=50
-  
+
   set guicursor+=n-v-c:blinkon0
 
   if has("gui_gtk")

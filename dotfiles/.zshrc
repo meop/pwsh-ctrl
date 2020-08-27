@@ -1,7 +1,3 @@
-# WSL hacks
-# sudo chmod -R 755 ~/.zplug
-setopt NO_BG_NICE
-
 . ~/.zplug/init.zsh
 
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
@@ -30,22 +26,20 @@ fi
 # Then, source plugins and add commands to $PATH
 zplug load
 
+
 ZSH_THEME="prompt"
 
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
-# AWS cli completion support
-if type aws > /dev/null; then
-    autoload bashcompinit && bashcompinit
-    complete -C '/usr/local/bin/aws_completer' aws
-fi
+
+# AWS Tab Completion
+autoload bashcompinit && bashcompinit
+complete -C '/usr/local/bin/aws_completer' aws
 
 
 # Setup basic shell tools
 
 export VISUAL=vim
-
-export OSID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
 
 
 # Setup drivers
@@ -54,10 +48,6 @@ export OSID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
 export LIBVA_DRIVER_NAME="iHD"
 # Nvidia
 #export LIBVA_DRIVER_NAME="vdpau"
-
-
-# Setup language tools
-#. ~/.nvm/nvm.sh
 
 
 # X functions

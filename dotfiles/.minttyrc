@@ -1,7 +1,7 @@
 BoldAsFont=-1
 FontHeight=11
 Font=Hack
-Columns=150
+Columns=160
 Rows=50
 ScrollbackLines=9999
 CursorColour=248,248,242
