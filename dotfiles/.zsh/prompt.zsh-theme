@@ -25,9 +25,13 @@ ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg_bold[blue]%}]%{$reset_color%}"
 OSID=$(cat /etc/os-release | awk -F= '/^ID=/{print $2}')
 
 function charHost {
-    if [[ $OSID == 'arch' ]]; then echo '\uf303'
+    if [[ $OSID == 'alpine' ]]; then echo '\uf300'
+    elif [[ $OSID == 'arch' ]]; then echo '\uf303'
+    elif [[ $OSID == 'manjaro' ]]; then echo '\uf312'
     elif [[ $OSID == 'debian' ]]; then echo '\uf306'
-    elif [[ $OSID == 'raspios' ]]; then echo '\uf315'
+    elif [[ $OSID == 'raspbian' ]]; then echo '\uf315'
+    elif [[ $OSID == 'ubuntu' ]]; then echo '\uf31b'
+    elif [[ $OSID == 'linuxmint' ]]; then echo '\uf30e'
     else echo '\uf17c'
     fi
 }
